@@ -1,32 +1,53 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getProductThunk } from "./redux/reducers/productSlice";
+import { sendCategoryForm } from "./redux/reducers/productSlice";
 
 const App = () => {
   const dispatch = useDispatch();
+  const { formStatus, loading, error } = useSelector((state) => state.product);
 
-  const db = useSelector((state) => state.product.products);
-  const loading = useSelector((state) => state.product.loading);
-  const error = useSelector((state) => state.product.error);
-  console.log();
-  
-  useEffect(() => {
-    dispatch(getProductThunk());
-  }, []);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: ''
+  });
 
-  if (loading) return <span>Yuklenir</span>;
-  if (error) return <span>Yukleme zamani Xeta bas verdi</span>;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(sendCategoryForm(formData));  // Formu göndər
+  };
 
   return (
     <div>
-      {db &&
-        db.map((item) => {
-          return (
-            <div>
-              <span>{item.title}</span>
-            </div>
-          );
-        })}
+      <form onSubmit={handleSubmit}>
+        <input 
+          type="text" 
+          name="name" 
+          value={formData.name} 
+          onChange={handleChange} 
+          placeholder="Email adress" 
+        />
+        <input 
+          type="text" 
+          name="email" 
+          value={formData.email} 
+          onChange={handleChange} 
+          placeholder="Tesvir" 
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? 'Göndərilir...' : 'Göndər'}
+        </button>
+      </form>
+
+      {formStatus === 'success' && <div>Forma uğurla göndərildi!</div>}
+      {formStatus === 'error' && <div>{error || 'Bir xəta baş verdi'}</div>}
     </div>
   );
 };

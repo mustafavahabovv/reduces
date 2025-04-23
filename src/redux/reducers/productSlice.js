@@ -1,10 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const getProductThunk = createAsyncThunk('/get/products', async () => {
-  const res = await axios.get('https://fakestoreapi.com/products');
-  return res.data;
-});
+
+export const sendCategoryForm = createAsyncThunk(
+  '/send/category', 
+  async (formData) => {
+    try {
+      const response = await axios.post('https://northwind.vercel.app/api/categories', formData);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  }
+);
 
 const productSlice = createSlice({
   name: 'products',
@@ -12,21 +20,24 @@ const productSlice = createSlice({
     products: [],
     loading: false,
     error: null,
+    formStatus: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getProductThunk.pending, (state) => {
+      .addCase(sendCategoryForm.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.formStatus = 'loading';
       })
-      .addCase(getProductThunk.fulfilled, (state, action) => {
+      .addCase(sendCategoryForm.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload;
+        state.formStatus = 'success';
       })
-      .addCase(getProductThunk.rejected, (state, action) => {
+      .addCase(sendCategoryForm.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+        state.formStatus = 'error';
       });
   },
 });
