@@ -8,7 +8,7 @@ const App = () => {
 
   const [formData, setFormData] = useState({
     name: '',
-    description: ''
+    email: ''
   });
 
   const handleChange = (e) => {
@@ -21,7 +21,7 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(sendCategoryForm(formData));  // Formu göndər
+    dispatch(sendCategoryForm(formData));
   };
 
   return (
